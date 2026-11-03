@@ -3,7 +3,7 @@ export const HOME = {
   'Member': '/dashboard',
   'Staff': '/register-member',
   'Loan Officer': '/pending-applications',
-  'Accountant': '/bank-transactions',
+  'Accountant': '/verify-deposits',
   'Admin': '/admin',
   'System Administrator': '/admin',
 };

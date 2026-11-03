@@ -5,7 +5,10 @@ const TABS = {
   'Staff': [['/register-member', 'Register Member'], ['/record-deposit', 'Record Deposit']],
   'Member': [['/dashboard', 'Dashboard'], ['/apply-loan', 'Apply for Loan']],
   'Loan Officer': [['/pending-applications', 'Pending Applications']],
-  'Accountant': [['/bank-transactions', 'Bank Transactions']],
+  'Accountant': [
+    ['/verify-deposits', 'Verify Deposits'],
+    ['/bank-transactions', 'Bank Transactions']
+  ],
 };
 
 export default function Layout({ children }) {

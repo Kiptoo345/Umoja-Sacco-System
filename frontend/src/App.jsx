@@ -4,6 +4,7 @@ import Placeholder from './Pages/Placeholder';
 import ProtectedRoute from './components/ProtectedRoute';
 import RegisterMember from './Pages/RegisterMember';
 import RecordDeposit from './Pages/RecordDeposit';
+import VerifyDeposits from './Pages/VerifyDeposits';
 
 export default function App() {
   return (
@@ -16,6 +17,9 @@ export default function App() {
       <Route path="/record-deposit" element={
         <ProtectedRoute roles={['Staff']}><RecordDeposit /></ProtectedRoute>
       } />
+      <Route path="/verify-deposits" element={
+        <ProtectedRoute roles={['Accountant']}><VerifyDeposits /></ProtectedRoute>
+      } />
 
       {/* still placeholders, to be replaced one at a time */}
       <Route path="/dashboard" element={<Placeholder title="Member Dashboard" />} />
@@ -23,7 +27,6 @@ export default function App() {
       <Route path="/pending-applications" element={<Placeholder title="Pending Applications" />} />
       <Route path="/bank-transactions" element={<Placeholder title="Bank Transactions" />} />
       <Route path="/admin" element={<Placeholder title="Admin Panel" />} />
-
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
