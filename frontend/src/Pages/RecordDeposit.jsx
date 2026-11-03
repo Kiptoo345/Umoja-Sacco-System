@@ -3,23 +3,24 @@ import { apiFetch } from '../api';
 import Layout from '../components/Layout';
 
 export default function RecordDeposit() {
-  const [number, setNumber] = useState('');
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]); 
   const [member, setMember] = useState(null);
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  async function search() {
+  async function search(e) {
+    e?.preventDefault();
     setError('');
     setMember(null);
+    setResults([]);
     try {
-      const n = number.trim();
-      const rows = await apiFetch(`/members?search=${encodeURIComponent(n)}`);
-      const found = rows.find((r) => r.membership_number === n);
-      if (!found) throw new Error('Member not found');
-      if (found.status !== 'Active') throw new Error('Member account is inactive');
-      setMember(found);
+      const rows = await apiFetch(`/members?search=${encodeURIComponent(query.trim())}`);
+      const active = rows.filter((r) => r.status === 'Active');
+      if (!active.length) throw new Error('No active member found');
+      setResults(active);
     } catch (err) {
       setError(err.message);
     }
@@ -29,6 +30,12 @@ export default function RecordDeposit() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    if (!member || !amount || Number(amount) <= 0) {
+      setError('Please select a member and enter a valid deposit amount.');
+      setLoading(false);
+      return;
+    }
+    
     try {
       const data = await apiFetch('/deposits', {
         method: 'POST',
@@ -43,7 +50,7 @@ export default function RecordDeposit() {
   }
 
   function reset() {
-    setNumber(''); setMember(null); setAmount(''); setResult(null); setError('');
+    setQuery(''); setResults([]); setMember(null); setAmount(''); setResult(null); setError('');
   }
 
   if (result) {
@@ -60,11 +67,29 @@ export default function RecordDeposit() {
 
   return (
     <Layout>
-      <h2>Record Member Deposit</h2>
-      <label>Membership No. *{' '}
-        <input value={number} onChange={(e) => setNumber(e.target.value)} />
-      </label>{' '}
-      <button type="button" onClick={search}>Search</button>
+    <form onSubmit={search} style={{ display: 'flex', gap: 8, maxWidth: 480 }}>
+      <input placeholder="Search by name or membership no." value={query}
+          onChange={(e) => setQuery(e.target.value)} />
+      <button type="submit">Search</button>
+    </form>
+
+    {!member && results.length > 0 && (
+      <table style={{ marginTop: 16 }}>
+        <thead>
+          <tr><th>Name</th><th>Membership No.</th><th>Phone</th><th></th></tr>
+        </thead>
+        <tbody>
+          {results.map((r) => (
+            <tr key={r.member_id}>
+              <td>{r.full_name}</td>
+              <td>{r.membership_number}</td>
+              <td>{r.phone_number}</td>
+              <td><button type="button" onClick={() => setMember(r)}>Select</button></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
 
       {member && (
         <form onSubmit={submit} style={{ marginTop: 16, display: 'grid', gap: 8, maxWidth: 360 }}>
@@ -80,7 +105,7 @@ export default function RecordDeposit() {
           </div>
         </form>
       )}
-      {error && <div style={{ color: '#c00', marginTop: 12 }}>{error}</div>}
-    </Layout>
-  );
+      {error && <div style={{ color: '#c00', marginTop: 12 }}> {error} </div>}
+      </Layout>
+  ) ;
 }
