@@ -14,7 +14,10 @@ const FILES = ['Umoja_sacco_db.sql', 'RegisterNewMember.sql', 'AfterDepositVerif
                'ApproveLoanApplication.sql', 'AfterLoanRepayment.sql', 'View_MemberDashboard.sql'];
 
 function git(args, cwd) { return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }); }
-function readTeammateFile(name) {
+{  
+const shared = path.join(__dirname, '..', '..', 'database', name);
+  if (fs.existsSync(shared)) return fs.readFileSync(shared, 'utf8');
+
   const local = path.join(__dirname, 'teammate', name);
   if (fs.existsSync(local)) return fs.readFileSync(local, 'utf8');
   try {
