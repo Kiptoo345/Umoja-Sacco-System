@@ -1,3 +1,4 @@
+import { PHONE_PATTERN, PHONE_TITLE, cleanPhone } from '../../validators';
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../../api';
 
@@ -42,7 +43,7 @@ export default function Employees() {
         <label>Last name *<input value={form.lastName} onChange={set('lastName')} required /></label>
         <label>Username *<input value={form.username} onChange={set('username')} required minLength={3} /></label>
         <label>Email *<input type="email" value={form.email} onChange={set('email')} required /></label>
-        <label>Phone *<input value={form.phone} onChange={set('phone')} required minLength={7} /></label>
+        <label>Phone *<input type="tel" inputMode="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: cleanPhone(e.target.value) })} pattern={PHONE_PATTERN} title={PHONE_TITLE} maxLength={13} required /></label>
         <label>Position *<input value={form.position} onChange={set('position')} required /></label>
         <label>Role *
           <select value={form.role} onChange={set('role')}>

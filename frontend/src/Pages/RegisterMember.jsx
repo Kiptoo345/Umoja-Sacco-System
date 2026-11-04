@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { apiFetch } from '../api';
 import Layout from '../components/Layout';
+import { PHONE_PATTERN, PHONE_TITLE, cleanPhone } from '../validators';
 
-const EMPTY = { firstName: '', lastName: '', email: '', phone: '', address: '' };
+const EMPTY = { firstName: '', lastName: '', username: '', email: '', phone: '', address: '' };
 
 export default function RegisterMember() {
   const [form, setForm] = useState(EMPTY);
@@ -17,7 +18,10 @@ export default function RegisterMember() {
     setError('');
     setLoading(true);
     try {
-      const data = await apiFetch('/members', { method: 'POST', body: JSON.stringify(form) });
+      const payload = { ...form };
+      if (!payload.username.trim()) delete payload.username; // blank = API defaults to email
+      else payload.username = payload.username.trim();
+      const data = await apiFetch('/members', { method: 'POST', body: JSON.stringify(payload) });
       setResult(data);
     } catch (err) {
       setError(err.message);
@@ -46,7 +50,8 @@ export default function RegisterMember() {
         <label>First Name *<input value={form.firstName} onChange={set('firstName')} required /></label>
         <label>Last Name *<input value={form.lastName} onChange={set('lastName')} required /></label>
         <label>Email *<input type="email" value={form.email} onChange={set('email')} required /></label>
-        <label>Phone Number *<input value={form.phone} onChange={set('phone')} required /></label>
+        <label>Username (optional)<input value={form.username} onChange={set('username')} minLength={3} maxLength={50} placeholder="Leave blank to use the email" autoComplete="off" /></label>
+        <label>Phone Number *<input type="tel" inputMode="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: cleanPhone(e.target.value) })} pattern={PHONE_PATTERN} title={PHONE_TITLE} maxLength={13} placeholder="0712345678" required /></label>
         <label>Residential Address<input value={form.address} onChange={set('address')} /></label>
         {error && <div style={{ color: '#c00' }}>{error}</div>}
         <div>

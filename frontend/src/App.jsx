@@ -1,6 +1,7 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Pages/Login';
+import Landing from './Pages/Landing';
 import Placeholder from './Pages/Placeholder';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
@@ -22,6 +23,7 @@ import PendingApplications from './Pages/PendingApplications';
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
 
       <Route path="/register-member" element={
@@ -84,7 +86,7 @@ export default function App() {
         } />
       ))}
 
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

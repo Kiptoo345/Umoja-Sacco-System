@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../api';
 import { HOME } from '../roles';
+import logo from '../assets/logo.png';
+import SiteFooter from '../components/SiteFooter';
 import './Login.css';
 
 export default function Login() {
@@ -33,46 +35,54 @@ export default function Login() {
 
   return (
     <div className="page">
-      <header className="header">Umoja Community SACCO</header>
+      <main className="login-main">
+        <section className="login-brand">
+          <Link to="/" className="login-back">← Back to home</Link>
+          <img src={logo} alt="Umoja Community SACCO logo" className="login-logo" />
+          <h1>Umoja Community SACCO</h1>
+          <p>Together We Save, Together We Prosper.</p>
+        </section>
 
-      <main className="main">
-        <form className="card" onSubmit={handleSubmit}>
-          <h2>Welcome Back</h2>
-          <p>Sign in to your account</p>
+        <section className="login-panel">
+          <form className="login-card" onSubmit={handleSubmit}>
+            <h2>Welcome Back</h2>
+            <p className="login-sub">Sign in to your account</p>
 
-          <label htmlFor="username">Username or Email</label>
-          <input
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-
-          <label htmlFor="password">Password</label>
-          <div className="password-row">
+            <label htmlFor="username">Username or Email</label>
             <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
               required
             />
-            <button type="button" onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? 'Hide' : 'Show'}
+
+            <label htmlFor="password">Password</label>
+            <div className="password-row">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+
+            {error && <div className="error">{error}</div>}
+
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? 'Signing in...' : 'LOGIN'}
             </button>
-          </div>
 
-          {error && <div className="error">{error}</div>}
-
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Signing in...' : 'LOGIN'}
-          </button>
-
-          <small>Forgot password? Contact the System Administrator</small>
-        </form>
+            <small>Forgot password? Contact the System Administrator</small>
+          </form>
+        </section>
       </main>
-
-      <footer className="footer">© Umoja Community SACCO</footer>
+      <SiteFooter />
     </div>
   );
 }

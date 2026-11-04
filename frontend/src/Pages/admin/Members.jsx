@@ -1,3 +1,4 @@
+import { PHONE_PATTERN, PHONE_TITLE, cleanPhone } from '../../validators';
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../../api';
 
@@ -66,7 +67,7 @@ export default function Members() {
           <h3 style={{ gridColumn: '1 / -1', margin: 0 }}>Edit {editing.membership_number}</h3>
           <label>First name<input name="firstName" defaultValue={editing.first_name} required /></label>
           <label>Last name<input name="lastName" defaultValue={editing.last_name} required /></label>
-          <label>Phone<input name="phone" defaultValue={editing.phone_number} required minLength={7} /></label>
+          <label>Phone<input name="phone" type="tel" inputMode="tel" defaultValue={editing.phone_number} pattern={PHONE_PATTERN} title={PHONE_TITLE} maxLength={13} onChange={(e) => { e.target.value = cleanPhone(e.target.value); }} required /></label>
           <label>Address<input name="address" defaultValue={editing.address || ''} /></label>
           <div>
             <button type="button" onClick={() => setEditing(null)}>Cancel</button>{' '}
