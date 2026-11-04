@@ -6,8 +6,9 @@ const TABS = {
   'Member': [['/dashboard', 'Dashboard'], ['/apply-loan', 'Apply for Loan']],
   'Loan Officer': [['/pending-applications', 'Pending Applications']],
   'Accountant': [
-    ['/verify-deposits', 'Verify Deposits'],
-    ['/bank-transactions', 'Bank Transactions']
+  ['/verify-deposits', 'Verify Deposits'],
+  ['/bank-transactions', 'Bank Transactions'],
+  ['/loan-repayments', 'Loan Repayments']
   ],
 };
 
