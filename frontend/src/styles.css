@@ -274,3 +274,10 @@ th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
     overflow-x: auto;
   }
 }
+
+.grid-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 700px; }
+.success { color: var(--primary-dark); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.stat { border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: var(--bg); }
+.stat-label { font-size: .85rem; color: #667; }
+.stat-value { font-size: 1.5rem; font-weight: 600; color: var(--primary-dark); }

@@ -2,13 +2,30 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import './Layout.css';
 
 const TABS = {
-  'Staff': [['/register-member', 'Register Member'], ['/record-deposit', 'Record Deposit']],
-  'Member': [['/dashboard', 'Dashboard'], ['/apply-loan', 'Apply for Loan']],
-  'Loan Officer': [['/pending-applications', 'Pending Applications']],
+  'Staff': [
+    ['/register-member', 'Register Member'],
+    ['/record-deposit', 'Record Deposit']
+  ],
+  'Member': [
+    ['/dashboard', 'Dashboard'],
+    ['/apply-loan', 'Apply for Loan']
+  ],
+  'Loan Officer': [
+    ['/pending-applications', 'Pending Applications']
+  ],
   'Accountant': [
-  ['/verify-deposits', 'Verify Deposits'],
-  ['/bank-transactions', 'Bank Transactions'],
-  ['/loan-repayments', 'Loan Repayments']
+    ['/verify-deposits', 'Verify Deposits'],
+    ['/bank-transactions', 'Bank Transactions'],
+    ['/loan-repayments', 'Loan Repayments']
+  ],
+  'Admin': [
+    ['/admin/employees', 'Employees'],
+    ['/admin/members', 'Members'],
+    ['/admin/reports', 'Reports'],
+  ],
+  'System Administrator': [
+    ['/admin/users', 'User Accounts'],
+    ['/admin/audit-log', 'Audit Log'],
   ],
 };
 

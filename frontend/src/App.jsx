@@ -4,6 +4,11 @@ import Login from './Pages/Login';
 import Placeholder from './Pages/Placeholder';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import Employees from './Pages/admin/Employees';
+import Members from './Pages/admin/Members';
+import Reports from './Pages/admin/Reports';
+import Users from './Pages/admin/Users';
+import AuditLog from './Pages/admin/AuditLog';
 
 import RegisterMember from './Pages/RegisterMember';
 import RecordDeposit from './Pages/RecordDeposit';
@@ -67,12 +72,17 @@ export default function App() {
         </ProtectedRoute>
       } />
 
-      {/* Still placeholders, to be replaced one at a time */}
-      <Route path="/admin" element={
-        <ProtectedRoute roles={['Admin', 'System Administrator']}>
-          <Layout><Placeholder title="Admin Panel" /></Layout>
-        </ProtectedRoute>
-      } />
+     {[
+        ['/admin/employees', ['Admin'], <Employees />],
+        ['/admin/members', ['Admin'], <Members />],
+        ['/admin/reports', ['Admin'], <Reports />],
+        ['/admin/users', ['System Administrator'], <Users />],
+        ['/admin/audit-log', ['System Administrator'], <AuditLog />],
+      ].map(([path, roles, page]) => (
+        <Route key={path} path={path} element={
+          <ProtectedRoute roles={roles}><Layout>{page}</Layout></ProtectedRoute>
+        } />
+      ))}
 
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

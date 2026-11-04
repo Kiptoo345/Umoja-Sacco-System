@@ -4,6 +4,6 @@ export const HOME = {
   'Staff': '/register-member',
   'Loan Officer': '/pending-applications',
   'Accountant': '/verify-deposits',
-  'Admin': '/admin',
-  'System Administrator': '/admin',
+  'Admin': '/admin/employees',
+  'System Administrator': '/admin/users',
 };
