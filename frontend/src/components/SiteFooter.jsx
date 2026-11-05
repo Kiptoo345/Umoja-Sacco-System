@@ -41,8 +41,8 @@ export default function SiteFooter() {
           <h4>Contact</h4>
           <ul>
             <li>Nairobi, Kenya</li>
-            <li>+254 700 000 000</li>
-            <li>info@umojasacco.example</li>
+            <li>+254 798 765 432</li>
+            <li>info@umojasacco.co.ke</li>
             <li>Mon – Fri, 8:00 – 17:00</li>
           </ul>
         </div>

@@ -1,6 +1,6 @@
 # Umoja Community SACCO: Back-end API
 
-Node.js + Express + MySQL. It works on top of the database owner's schema (branch `schema`): their tables, the
+Node.js + Express + MySQL. It works on top of the project's database files in the repo's `database/` folder: the
 `RegisterNewMember` and `ApproveLoanApplication` procedures, the `AfterDepositVerified` and `AfterLoanRepayment`
 triggers and the `View_MemberDashboard` view. The API never changes balances itself; the triggers do.
 
@@ -9,13 +9,13 @@ audit log, all-or-nothing database transactions.
 
 ## Run it
 1. Install Node.js 18+ and MySQL 8 (or MariaDB 10.5+).
-2. `git fetch origin` (so `origin/schema` is available), then in this `backend/` folder: `npm install`
+2. In this `backend/` folder: `npm install`
 3. Copy `.env.example` to `.env` and fill in `DB_USER`, `DB_PASSWORD`, `JWT_SECRET` (keep `DB_NAME=umoja_sacco_db`).
-4. `npm run setup-db`  builds the database from the teammate's files plus `database/extras.sql`
+4. `npm run setup-db`  builds the database from the files in `database/` plus `database/extras.sql`
    (`node database/setup.js --reset` rebuilds from scratch and deletes data).
 5. `npm run seed`  then  `npm start`  -> http://localhost:3000/api/health      (`npm test` runs 46 end-to-end checks)
 
-Seeded logins (password `Password123!`, change it): admin, sysadmin, staff1, officer1, accountant1.
+Seeded logins (development only; password `Password123!`, change it): admin, sysadmin, staff1, officer1, accountant1.
 Members log in with the username given at registration (default: their email) and the temporary password.
 Send the token as `Authorization: Bearer <token>` on every request except login, forgot and reset password.
 
@@ -55,6 +55,11 @@ Admin, System Administrator, Staff, Loan Officer, Accountant, Member
 - A member may have only one open loan (no pending application and no active loan).
 - Repayments reduce the balance and close the loan through the `AfterLoanRepayment` trigger.
 
-## Not in the teammate's schema (added in database/extras.sql, additive only)
-`AuditLog` and `PasswordReset` tables. Suggest the database owner merges them into the main schema.
-Also not stored by the schema: who recorded a repayment (it is in the audit log), national ID, repayment period.
+## Additions beyond the base schema
+`database/extras.sql` adds two tables:
+- `AuditLog`: records logins, password changes and admin actions (viewed by the System Administrator).
+- `PasswordReset`: stores hashed, single-use reset tokens that expire after 30 minutes.
+
+## Password reset
+There is no email service yet. When `RETURN_RESET_TOKEN=true` in `.env`, the reset token is returned in the API response for development. Turn this off in a real deployment.
+
