@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Pages/Login';
 import Landing from './Pages/Landing';
+import ForgotPassword from './Pages/ForgotPassword';
 import Placeholder from './Pages/Placeholder';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
@@ -25,6 +26,9 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={
+        <ForgotPassword />
+      } />
 
       <Route path="/register-member" element={
         <ProtectedRoute roles={['Staff']}>

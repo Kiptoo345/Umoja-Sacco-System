@@ -78,7 +78,7 @@ export default function Login() {
               {loading ? 'Signing in...' : 'LOGIN'}
             </button>
 
-            <small>Forgot password? Contact the System Administrator</small>
+            <small><Link to="/forgot-password">Forgot password?</Link> </small>
           </form>
         </section>
       </main>
