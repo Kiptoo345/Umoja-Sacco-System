@@ -19,7 +19,8 @@ const TABS = {
   'Accountant': [
     ['/verify-deposits', 'Verify Deposits'],
     ['/bank-transactions', 'Bank Transactions'],
-    ['/loan-repayments', 'Loan Repayments']
+    ['/loan-repayments', 'Loan Repayments'],
+    ['/admin/reports', 'Reports'] // allows accountants to use the financial reports.
   ],
   'Admin': [
     ['/admin/employees', 'Employees'],

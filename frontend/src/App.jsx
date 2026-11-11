@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Pages/Login';
 import Landing from './Pages/Landing';
 import ForgotPassword from './Pages/ForgotPassword';
-import Placeholder from './Pages/Placeholder';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Employees from './Pages/admin/Employees';
@@ -79,9 +78,9 @@ export default function App() {
       } />
 
      {[
-        ['/admin/employees', ['Admin'], <Employees />],
-        ['/admin/members', ['Admin'], <Members />],
-        ['/admin/reports', ['Admin'], <Reports />],
+        ['/admin/employees', ['Admin', 'Accountant'], <Employees />],
+        ['/admin/members', ['Admin', 'Accountant'], <Members />],
+        ['/admin/reports', ['Admin', 'Accountant'], <Reports />],
         ['/admin/users', ['System Administrator'], <Users />],
         ['/admin/audit-log', ['System Administrator'], <AuditLog />],
       ].map(([path, roles, page]) => (

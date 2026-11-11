@@ -24,7 +24,7 @@ router.post('/', requireRole('Staff'), wrap(async (req, res) => {
   res.status(201).json({ ...result, message: 'Deposit recorded. Savings update once the accountant verifies it.' });
 }));
 
-router.get('/', requireRole('Staff', 'Accountant'), wrap(async (req, res) => {
+router.get('/', requireRole('Staff', 'Accountant', 'Admin'), wrap(async (req, res) => {
   const status = ['Pending Verification', 'Verified', 'Rejected'].includes(req.query.status) ? req.query.status : null;
   const [rows] = await pool.execute(
     `SELECT d.deposit_id, m.membership_number, CONCAT(m.first_name,' ',m.last_name) AS full_name, d.amount, d.deposit_date, d.status

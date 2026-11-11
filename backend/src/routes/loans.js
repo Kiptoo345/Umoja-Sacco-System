@@ -80,7 +80,7 @@ router.get('/me', requireRole('Member'), wrap(async (req, res) => {
   res.json(rows);
 }));
 
-router.get('/', requireRole('Accountant', 'Loan Officer'), wrap(async (req, res) => {
+router.get('/', requireRole('Accountant', 'Loan Officer', 'Admin'), wrap(async (req, res) => {
   const status = ['Active', 'Closed', 'Defaulted'].includes(req.query.status) ? req.query.status : null;
   const [rows] = await pool.execute(
     `SELECT ${LOAN_COLS}, m.membership_number, CONCAT(m.first_name,' ',m.last_name) AS full_name
