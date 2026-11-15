@@ -19,6 +19,7 @@ import LoanRepayments from './Pages/LoanRepayments';
 import MemberDashboard from './Pages/MemberDashboard';
 import ApplyLoan from './Pages/ApplyLoan';
 import PendingApplications from './Pages/PendingApplications';
+import Help from './Pages/Help';
 
 export default function App() {
   return (
@@ -89,6 +90,12 @@ export default function App() {
         } />
       ))}
 
+      <Route path="/help" element={
+        <ProtectedRoute>
+          <Layout><Help /></Layout>
+        </ProtectedRoute>
+      } />
+      
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

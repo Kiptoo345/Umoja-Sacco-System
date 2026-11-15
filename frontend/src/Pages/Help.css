@@ -1,0 +1,17 @@
+.help { max-width: 800px; }
+.help-intro { color: #5b6b62; }
+.help h3 { margin-top: 28px; color: #14452c; }
+
+.help-item {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-left: 4px solid #e0a526;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin: 10px 0;
+}
+.help-item summary { cursor: pointer; font-weight: 600; }
+.help-item summary:hover { color: #1b5e3b; }
+.help-item ol { margin: 10px 0 4px; padding-left: 22px; line-height: 1.7; }
+.help-item p { margin: 10px 0 4px; line-height: 1.6; }
+.help-contact { margin-top: 28px; color: #5b6b62; }

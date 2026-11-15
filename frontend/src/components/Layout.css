@@ -42,3 +42,6 @@
   .brand-name { display: none; }
   .welcome-text { display: none; }
 }
+
+.help-link { color: #d9e6de; text-decoration: none; font-weight: 500; margin: 0 4px; }
+.help-link:hover { color: #f0c04a; }

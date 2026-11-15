@@ -60,6 +60,7 @@ export default function Layout({ children }) {
           </Link>
           <span className="welcome">
             <span className="welcome-text">Welcome, {user?.fullName}</span>
+            <Link to="/help" className="help-link">Help</Link>
             <button onClick={logout}>Logout</button>
           </span>
         </header>
