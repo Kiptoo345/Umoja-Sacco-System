@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { pool, withTransaction } = require('../db');
 const { audit } = require('../audit');
 const { authenticate, requireRole } = require('../auth');
-const { HttpError, wrap, text, password } = require('../util');
+const { HttpError, wrap, parseId, text, password } = require('../util');
 const router = express.Router();
 router.use(authenticate);
 
@@ -55,16 +55,25 @@ router.get('/users', requireRole('System Administrator'), wrap(async (req, res) 
 }));
 
 router.patch('/users/:id', requireRole('System Administrator'), wrap(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
   const b = req.body || {};
   if (id === req.user.userId) throw new HttpError(400, 'You cannot change your own role or status');
   if (b.status !== undefined && !['Active', 'Inactive'].includes(b.status)) throw new HttpError(400, 'status must be Active or Inactive');
   await withTransaction(async (conn) => {
-    const [u] = await conn.execute('SELECT user_id FROM User WHERE user_id=?', [id]);
+    const [u] = await conn.execute(
+      `SELECT u.user_id, EXISTS(SELECT 1 FROM Staff s WHERE s.user_id=u.user_id) AS is_staff,
+              EXISTS(SELECT 1 FROM Member m WHERE m.user_id=u.user_id) AS is_member
+         FROM User u WHERE u.user_id=? FOR UPDATE`, [id]);
     if (!u.length) throw new HttpError(404, 'User not found');
     if (b.role !== undefined) {
       const [r] = await conn.execute('SELECT role_id FROM Role WHERE role_name=?', [b.role]);
       if (!r.length) throw new HttpError(400, 'Unknown role');
+      // A role only works with the matching profile: Member needs a Member record, every other role a Staff record.
+      // Switching between the two would leave an account whose screens cannot load.
+      if (b.role === 'Member' && !u[0].is_member)
+        throw new HttpError(400, 'Only accounts registered as members can have the Member role');
+      if (b.role !== 'Member' && !u[0].is_staff)
+        throw new HttpError(400, 'Members cannot be given an employee role; create an employee account instead');
       await conn.execute('UPDATE User SET role_id=? WHERE user_id=?', [r[0].role_id, id]);
     }
     if (b.status !== undefined) await conn.execute('UPDATE User SET is_active=? WHERE user_id=?', [b.status === 'Active' ? 1 : 0, id]);
@@ -74,7 +83,7 @@ router.patch('/users/:id', requireRole('System Administrator'), wrap(async (req,
 }));
 
 router.post('/users/:id/reset-password', requireRole('System Administrator'), wrap(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
   const pw = password((req.body || {}).newPassword, 'newPassword');
   const [u] = await pool.execute('SELECT user_id FROM User WHERE user_id=?', [id]);
   if (!u.length) throw new HttpError(404, 'User not found');

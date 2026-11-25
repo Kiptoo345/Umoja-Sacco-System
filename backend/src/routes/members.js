@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const { pool, withTransaction } = require('../db');
 const { audit } = require('../audit');
 const { authenticate, requireRole } = require('../auth');
-const { HttpError, wrap, text } = require('../util');
+const { HttpError, wrap, parseId, text } = require('../util');
 const router = express.Router();
 router.use(authenticate);
 
@@ -55,13 +55,13 @@ router.get('/', requireRole('Staff', 'Admin', 'Accountant', 'Loan Officer'), wra
 }));
 
 router.get('/:id', requireRole('Staff', 'Admin', 'Accountant', 'Loan Officer'), wrap(async (req, res) => {
-  const [rows] = await pool.execute(`${MEMBER_SELECT} WHERE m.member_id=?`, [Number(req.params.id)]);
+  const [rows] = await pool.execute(`${MEMBER_SELECT} WHERE m.member_id=?`, [parseId(req.params.id)]);
   if (!rows.length) throw new HttpError(404, 'Member not found');
   res.json(rows[0]);
 }));
 
 router.put('/:id', requireRole('Admin'), wrap(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
   const b = req.body || {};
   const opt = (v, f, o) => (v === undefined ? null : text(v, f, o));
   const firstName = opt(b.firstName, 'firstName', { max: 50 });

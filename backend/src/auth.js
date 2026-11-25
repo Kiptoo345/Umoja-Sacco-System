@@ -10,9 +10,11 @@ const authenticate = wrap(async (req, res, next) => {
   let payload;
   try { payload = jwt.verify(token, process.env.JWT_SECRET); }
   catch { return res.status(401).json({ error: 'Session expired or invalid. Please log in again.' }); }
-  // Re-check the account every request so deactivating a user takes effect immediately.
-  const [rows] = await pool.execute('SELECT is_active FROM User WHERE user_id=?', [payload.userId]);
+  // Re-check the account every request so deactivating a user or changing their role takes effect immediately.
+  const [rows] = await pool.execute(
+    'SELECT u.is_active, r.role_name FROM User u JOIN Role r ON r.role_id = u.role_id WHERE u.user_id=?', [payload.userId]);
   if (!rows.length || !rows[0].is_active) return res.status(401).json({ error: 'Account is inactive' });
+  if (rows[0].role_name !== payload.role) return res.status(401).json({ error: 'Your role has changed. Please log in again.' });
   req.user = payload;
   next();
 });

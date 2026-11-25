@@ -13,7 +13,7 @@ audit log, all-or-nothing database transactions.
 3. Copy `.env.example` to `.env` and fill in `DB_USER`, `DB_PASSWORD`, `JWT_SECRET` (keep `DB_NAME=umoja_sacco_db`).
 4. `npm run setup-db`  builds the database from the files in `database/` plus `database/extras.sql`
    (`node database/setup.js --reset` rebuilds from scratch and deletes data).
-5. `npm run seed`  then  `npm start`  -> http://localhost:3000/api/health      (`npm test` runs 46 end-to-end checks)
+5. `npm run seed`  then  `npm start`  -> http://localhost:3000/api/health      (`npm test` runs 56 end-to-end checks)
 
 Seeded logins (development only; password `Password123!`, change it): admin, sysadmin, staff1, officer1, accountant1.
 Members log in with the username given at registration (default: their email) and the temporary password.
@@ -34,17 +34,19 @@ Admin, System Administrator, Staff, Loan Officer, Accountant, Member
 | PUT /api/members/:id | Admin | edit or deactivate member |
 | GET /api/members/me | Member | dashboard: savings + total outstanding loan balance (FR3, FR5) |
 | POST /api/deposits | Staff | record deposit, status Pending Verification (FR2) |
-| GET /api/deposits | Staff, Accountant | list (?status=Pending Verification) |
+| GET /api/deposits | Staff, Accountant, Admin | list (?status=Pending Verification) |
+| GET /api/deposits/me | Member | own deposit history (pending, verified, rejected) |
 | PATCH /api/deposits/:id/verify | Accountant | `{decision:'Verify', bankReference}` or `{decision:'Reject'}`; verify adds to savings and logs a Credit |
 | POST /api/loans/applications | Member | `{amountRequested, purpose}` (FR3) |
 | GET /api/loans/applications | Loan Officer (all), Member (own) | list |
 | PATCH /api/loans/applications/:id/decision | Loan Officer | `{decision:'Approve'}` or `{decision:'Reject', comments}` (FR4) |
 | GET /api/loans/me | Member | own loans with outstanding balance (FR5) |
-| GET /api/loans | Accountant, Loan Officer | list loans |
+| GET /api/loans | Accountant, Loan Officer, Admin | list loans |
+| GET /api/loans/:id/repayments | Member (own loans), Accountant, Loan Officer, Admin | repayment history for one loan |
 | POST /api/loans/:id/repayments | Accountant | `{amount, paymentMethod, receiptNumber}`; logs a Credit |
 | GET, POST /api/bank-transactions | Accountant | ledger; POST `{type:'Credit'|'Debit', amount, referenceNumber, description}` |
 | GET, POST /api/employees | Admin | `{username,email,firstName,lastName,position,phone,password,role}` |
-| GET /api/users, PATCH /api/users/:id, POST /api/users/:id/reset-password | System Administrator | accounts, roles, status |
+| GET /api/users, PATCH /api/users/:id, POST /api/users/:id/reset-password | System Administrator | accounts, roles, status (members keep the Member role; employees can only move between employee roles; a role change logs the user out) |
 | GET /api/audit-logs | System Administrator | audit trail |
 | GET /api/reports/summary | Accountant, Admin | totals |
 | GET /api/roles | Admin, System Administrator | |
