@@ -79,7 +79,7 @@ export default function App() {
       } />
 
      {[
-        ['/admin/employees', ['Admin', 'Accountant'], <Employees />],
+        ['/admin/employees', ['Admin'], <Employees />],
         ['/admin/members', ['Admin', 'Accountant'], <Members />],
         ['/admin/reports', ['Admin', 'Accountant'], <Reports />],
         ['/admin/users', ['System Administrator'], <Users />],

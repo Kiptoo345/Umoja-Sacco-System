@@ -4,7 +4,7 @@ const express = require('express');
 const { pool, withTransaction } = require('../db');
 const { audit } = require('../audit');
 const { authenticate, requireRole } = require('../auth');
-const { HttpError, wrap, text, amount } = require('../util');
+const { HttpError, wrap, parseId, text, amount } = require('../util');
 const router = express.Router();
 router.use(authenticate);
 
@@ -45,7 +45,7 @@ router.get('/applications', requireRole('Loan Officer', 'Member'), wrap(async (r
 
 // Loan officer approves or rejects. Approval calls ApproveLoanApplication, which creates the Active loan with interest.
 router.patch('/applications/:id/decision', requireRole('Loan Officer'), wrap(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
   const b = req.body || {};
   if (!['Approve', 'Reject'].includes(b.decision)) throw new HttpError(400, "decision must be 'Approve' or 'Reject'");
   const comments = b.decision === 'Reject' ? text(b.comments, 'comments', { min: 3, max: 1000 })
@@ -89,9 +89,21 @@ router.get('/', requireRole('Accountant', 'Loan Officer', 'Admin'), wrap(async (
   res.json(rows);
 }));
 
+// Repayment history for one loan. A member may only see repayments on their own loans.
+router.get('/:id/repayments', requireRole('Member', 'Accountant', 'Loan Officer', 'Admin'), wrap(async (req, res) => {
+  const id = parseId(req.params.id);
+  const [l] = await pool.execute('SELECT member_id FROM Loan WHERE loan_id=?', [id]);
+  // Members get the same 404 for someone else's loan as for a missing one, so loan ids cannot be probed.
+  if (!l.length || (req.user.role === 'Member' && l[0].member_id !== req.user.memberId)) throw new HttpError(404, 'Loan not found');
+  const [rows] = await pool.execute(
+    `SELECT repayment_id, amount_paid, repayment_date, payment_method, receipt_number
+       FROM LoanRepayment WHERE loan_id=? ORDER BY repayment_id DESC`, [id]);
+  res.json(rows);
+}));
+
 // Accountant records a repayment and the matching Credit bank transaction in ONE transaction.
 router.post('/:id/repayments', requireRole('Accountant'), wrap(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
   const b = req.body || {};
   const amt = amount(b.amount);
   const receipt = text(b.receiptNumber, 'receiptNumber', { min: 3, max: 50 });

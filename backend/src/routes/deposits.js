@@ -4,7 +4,7 @@ const express = require('express');
 const { pool, withTransaction } = require('../db');
 const { audit } = require('../audit');
 const { authenticate, requireRole } = require('../auth');
-const { HttpError, wrap, text, amount } = require('../util');
+const { HttpError, wrap, parseId, text, amount } = require('../util');
 const router = express.Router();
 router.use(authenticate);
 
@@ -24,6 +24,13 @@ router.post('/', requireRole('Staff'), wrap(async (req, res) => {
   res.status(201).json({ ...result, message: 'Deposit recorded. Savings update once the accountant verifies it.' });
 }));
 
+// Member: their own deposit history, including pending and rejected deposits.
+router.get('/me', requireRole('Member'), wrap(async (req, res) => {
+  const [rows] = await pool.execute(
+    'SELECT deposit_id, amount, deposit_date, status FROM Deposit WHERE member_id=? ORDER BY deposit_id DESC LIMIT 200', [req.user.memberId]);
+  res.json(rows);
+}));
+
 router.get('/', requireRole('Staff', 'Accountant', 'Admin'), wrap(async (req, res) => {
   const status = ['Pending Verification', 'Verified', 'Rejected'].includes(req.query.status) ? req.query.status : null;
   const [rows] = await pool.execute(
@@ -35,7 +42,7 @@ router.get('/', requireRole('Staff', 'Accountant', 'Admin'), wrap(async (req, re
 
 // Accountant: the bank side. Verify (creates a Credit BankTransaction) or reject.
 router.patch('/:id/verify', requireRole('Accountant'), wrap(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
   const b = req.body || {};
   if (!['Verify', 'Reject'].includes(b.decision)) throw new HttpError(400, "decision must be 'Verify' or 'Reject'");
   const ref = b.decision === 'Verify' ? text(b.bankReference, 'bankReference', { min: 3, max: 50 }) : null;

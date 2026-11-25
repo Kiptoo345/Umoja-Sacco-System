@@ -22,6 +22,12 @@ function password(v, field = 'password') {
     throw new HttpError(400, `${field} must be 8 to 72 characters`);
   return v;
 }
+// Route ids like /members/:id must be positive whole numbers; anything else is a clean 400, not a database error.
+function parseId(v, field = 'id') {
+  const n = Number(v);
+  if (!Number.isInteger(n) || n <= 0 || n > 2147483647) throw new HttpError(400, `${field} must be a positive whole number`);
+  return n;
+}
 const today = () => new Date().toISOString().slice(0, 10);
 function dateOrToday(v) {
   if (!v) return today();
@@ -29,4 +35,4 @@ function dateOrToday(v) {
     throw new HttpError(400, 'date must be in YYYY-MM-DD format');
   return v;
 }
-module.exports = { HttpError, wrap, amount, text, password, today, dateOrToday };
+module.exports = { HttpError, wrap, amount, text, password, parseId, today, dateOrToday };

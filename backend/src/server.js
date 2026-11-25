@@ -12,10 +12,12 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 
-// Slow down password guessing: max 10 login attempts per IP every 15 minutes.
+// Slow down password guessing: max 10 failed login attempts per IP every 15 minutes.
+// Successful logins are not counted, so staff sharing the office's single internet IP do not lock each other out.
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
+  skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many login attempts. Please try again in 15 minutes.' },

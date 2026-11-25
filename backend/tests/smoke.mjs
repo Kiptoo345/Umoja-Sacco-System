@@ -46,6 +46,10 @@ r = await call('POST', '/deposits', staff, { membershipNumber, amount: 500 });
 await call('PATCH', `/deposits/${r.data.depositId}/verify`, acct, { decision: 'Reject' });
 r = await call('GET', '/members/me', member);
 check('rejected deposit does not change savings', r.data?.savings_balance === 10000, JSON.stringify(r));
+r = await call('GET', '/deposits/me', member);
+check('member sees own deposit history (verified + rejected)', r.status === 200 && r.data.length === 2 && r.data.some(d => d.status === 'Rejected'), JSON.stringify(r));
+check('staff cannot use member deposit history (403)', (await call('GET', '/deposits/me', staff)).status === 403);
+check('non-numeric id rejected cleanly (400)', (await call('GET', '/members/abc', staff)).status === 400);
 
 // Loan cycle (teammate's ApproveLoanApplication procedure)
 r = await call('POST', '/loans/applications', member, { amountRequested: 50000, purpose: 'Business stock' });
@@ -71,6 +75,10 @@ r = await call('GET', '/members/me', member);
 check('dashboard shows outstanding loan balance 35000', r.data?.total_outstanding_loan_balance === 35000, JSON.stringify(r));
 r = await call('POST', `/loans/${loanId}/repayments`, acct, { amount: 35000, paymentMethod: 'Cash', receiptNumber: 'REC2' + run });
 check('final repayment -> Closed, balance 0', r.data?.outstandingBalance === 0 && r.data.loanStatus === 'Closed', JSON.stringify(r));
+r = await call('GET', `/loans/${loanId}/repayments`, member);
+check('member sees repayment history (2 repayments)', r.status === 200 && r.data.length === 2, JSON.stringify(r));
+check('repayment history for unknown loan (404)', (await call('GET', '/loans/999999999/repayments', member)).status === 404);
+check('staff cannot read repayment history (403)', (await call('GET', `/loans/${loanId}/repayments`, staff)).status === 403);
 
 // Bank ledger
 r = await call('POST', '/bank-transactions', acct, { type: 'Debit', amount: 1000, referenceNumber: 'DEB' + run, description: 'Office expense' });
@@ -85,6 +93,12 @@ check('admin cannot create System Administrator (400)', (await call('POST', '/em
 r = await call('GET', '/users', sysadmin);
 check('sysadmin lists users', r.status === 200 && r.data.length >= 6);
 const clerk = r.data.find(u => u.username === 'clerk' + run);
+const memberUser = r.data.find(u => u.username === username);
+check('member cannot be given an employee role (400)', (await call('PATCH', `/users/${memberUser.user_id}`, sysadmin, { role: 'Accountant' })).status === 400);
+check('employee cannot be given the Member role (400)', (await call('PATCH', `/users/${clerk.user_id}`, sysadmin, { role: 'Member' })).status === 400);
+const clerkToken = await login('clerk' + run);
+check('sysadmin moves employee to another employee role', (await call('PATCH', `/users/${clerk.user_id}`, sysadmin, { role: 'Accountant' })).status === 200);
+check('old token stops working after role change (401)', (await call('GET', '/deposits', clerkToken)).status === 401);
 check('sysadmin deactivates a user', (await call('PATCH', `/users/${clerk.user_id}`, sysadmin, { status: 'Inactive' })).status === 200);
 check('deactivated user cannot log in', !(await login('clerk' + run)));
 r = await call('GET', '/audit-logs', sysadmin);
